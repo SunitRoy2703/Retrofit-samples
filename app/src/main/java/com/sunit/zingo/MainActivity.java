@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,10 +35,49 @@ public class MainActivity extends AppCompatActivity {
 
         jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
 
-        getPost();
+        // getPost();
 
-      //  getComments();
+        //  getComments();
 
+        createPost();
+
+    }
+
+    private void createPost() {
+
+        Post post = new Post(27, "Sunit Roy", "Sunit Roy 2703");
+
+        Map<String, String> fields = new HashMap<>();
+        fields.put("userId", "27");
+        fields.put("title", "Sunit Roy");
+
+        Call<Post> call = jsonPlaceHolderApi.createPost(fields);
+
+        call.enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(Call<Post> call, Response<Post> response) {
+
+                if (!response.isSuccessful()) {
+                    textViewResult.setText("Code: " + response.code());
+                    return;
+                }
+
+                Post post1 = response.body();
+
+                String content = " ";
+                content += "Code: " + response.code() + "\n";
+                content += post1.getId() + "\n" + post1.getUserId() + "\n" + post1.getTitle() + "\n" + post1.getText() + "\n\n";
+
+                textViewResult.append(content);
+
+            }
+
+            @Override
+            public void onFailure(Call<Post> call, Throwable t) {
+
+                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void getComments() {
@@ -53,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
                 List<Comment> comments = response.body();
 
-                for (Comment comment: comments){
+                for (Comment comment : comments) {
                     String content = " ";
                     content += comment.getId() + "\n" + comment.getPostId() + "\n" + comment.getName() + "\n" + comment.getEmail() + "\n\n";
 
