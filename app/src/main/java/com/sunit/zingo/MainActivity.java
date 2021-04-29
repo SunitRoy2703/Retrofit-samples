@@ -17,6 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private TextView textViewResult;
+    private JsonPlaceHolderApi jsonPlaceHolderApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +31,47 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        JsonPlaceHolderApi jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
+        jsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
+
+        getPost();
+
+      //  getComments();
+
+    }
+
+    private void getComments() {
+        Call<List<Comment>> call = jsonPlaceHolderApi.getComments(3);
+
+        call.enqueue(new Callback<List<Comment>>() {
+            @Override
+            public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
+
+                if (!response.isSuccessful()) {
+                    textViewResult.setText("Code: " + response.code());
+                    return;
+                }
+
+                List<Comment> comments = response.body();
+
+                for (Comment comment: comments){
+                    String content = " ";
+                    content += comment.getId() + "\n" + comment.getPostId() + "\n" + comment.getName() + "\n" + comment.getEmail() + "\n\n";
+
+                    textViewResult.append(content);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Comment>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void getPost() {
 
 
-        Call<List<Post>> call = jsonPlaceHolderApi.getPosts();
+        Call<List<Post>> call = jsonPlaceHolderApi.getPosts(4);
 
         call.enqueue(new Callback<List<Post>>() {
             @Override
@@ -47,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
                 for (Post post : posts) {
                     String content = " ";
-                         content += post.getUserId() + "\n" + post.getId() + "\n" + post.getTitle() + "\n" + post.getText() + "\n\n";
+                    content += post.getUserId() + "\n" + post.getId() + "\n" + post.getTitle() + "\n" + post.getText() + "\n\n";
 
-                    textViewResult.setText(content);
+                    textViewResult.append(content);
 
                 }
             }
@@ -60,7 +98,5 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Failed", Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 }
