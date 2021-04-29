@@ -9,6 +9,8 @@ import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -21,8 +23,9 @@ public interface JsonPlaceHolderApi {
     @GET("/posts/{id}/comments")
     Call<List<Comment>> getComments(@Path("id") int postId);
 
+    @Headers({"Keydata: 43564354346767"})
     @POST("posts")
-    Call<Post> createPost(@Body Post post);
+    Call<Post> createPost(@Header("Keydata") String header,@Body Post post);
 
     @FormUrlEncoded
     @POST("posts")
@@ -36,5 +39,7 @@ public interface JsonPlaceHolderApi {
     @POST("posts")
     Call<Post> createPost(
             @FieldMap Map<String, String> fields);
+
+
 
 }
